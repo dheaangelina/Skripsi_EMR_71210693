@@ -9,7 +9,6 @@ $request = $_SERVER['REQUEST_URI'];
 $request = trim($request, '/');
 $segments = explode('/', $request);
 
-// $idPasien = $segments[count($segments) - 1] ?? 0;
 // Ambil idPasien dari session jika tersedia
 if (isset($_POST['idPasien'])) {
     $_SESSION['idPasien'] = $_POST['idPasien']; // Simpan ke session
@@ -201,48 +200,6 @@ $datahasil = $datahasil[0]; // Ambil hasil pertama
                                             array("CATATAN RENCANA TINDAKAN", "catatanTindakan", $datahasil["catatanTindakan"], 1),
                                         );
                                         _CreateWindowModalDetil($datahasil["idHasilLayanan"], "view", "viewsasaran-form", "viewsasaran-button", "", 600, "DETAIL#HASIL KINESIOTERAPI", "", $datadetail, "", $linkurl, "");
-                                        break;
-
-                                    case '3': // Detail Screening
-                                        $datadetail = array(
-                                            array("NAMA TERAPIS", "namaTerapis", $datahasil["namaTerapis"], 1),
-                                            array("KELUHAN", "keluhan", $datahasil["keluhan"], 1),
-                                            array("TANGGAL RUJUKAN", "tanggalRujukan", $datahasil["tanggalRujukan"], 1),
-                                            array("ALASAN RUJUKAN", "alasanRujukan", $datahasil["alasanRujukan"], 1),
-                                            array("TINGGI BADAN", "tinggiBadan", $datahasil["tinggiBadan"], 1),
-                                            array("BERAT BADAN", "beratBadan", $datahasil["beratBadan"], 1),
-                                            array("TEKANAN DARAH", "tekananDarah", $datahasil["tekananDarah"], 1),
-                                            array("GULA DARAH", "gulaDarah", $datahasil["gulaDarah"], 1),
-                                            array("KOLESTEROL", "kolesterol", $datahasil["kolesterol"], 1),
-                                            array("TRIGLISERIDA", "trigliserida", $datahasil["trigliserida"], 1),
-                                            array("BENJOLAN PAYUDARA", "benjolanPayudara", $datahasil["benjolanPayudara"], 1),
-                                            array("INSPEKSI VISUAL ASAM ASETAT", "inspeksiVisualAsamAsetat", $datahasil["inspeksiVisualAsamAsetat"], 1),
-                                            array("KADAR ALKOHOL PERNAFASAN", "kadarAlkoholPernafasan", $datahasil["kadarAlkoholPernafasan"], 1),
-                                            array("TES AMFETAMIN URIN", "tesAmfetaminUrin", $datahasil["tesAmfetaminUrin"], 1),
-                                            array("ARUS PERNAFASAN EKSPIRASI", "arusPernafasanEkspirasi", $datahasil["arusPernafasanEkspirasi"], 1),
-                                            array("FAKTOR RESIKO PERILAKU", "faktorResikoPerilaku", $datahasil["faktorResikoPerilaku"], 1),
-                                            array("DIAGNOSIS", "diagnosis", $datahasil["diagnosis"], 1),
-                                            array("HASIL PEMERIKSAAN", "hasilPemeriksaan", $datahasil["hasilPemeriksaan"], 1),
-                                            array("CATATAN RENCANA TINDAKAN", "catatanTindakan", $datahasil["catatanTindakan"], 1),
-                                        );
-                                        _CreateWindowModalDetil($datahasil["idHasilLayanan"], "view", "viewsasaran-form", "viewsasaran-button", "", 600, "DETAIL#HASIL SCREENING", "", $datadetail, "", $linkurl, "");
-
-                                        break;
-
-                                    case '4': // Detail Konsultasi
-                                        $datadetail = array(
-                                            array("NAMA TERAPIS", "namaTerapis", $datahasil["namaTerapis"], 1),
-                                            array("KELUHAN", "keluhan", $datahasil["keluhan"], 1),
-                                            array("HASIL PEMERIKSAAN", "hasilPemeriksaan", $datahasil["hasilPemeriksaan"], 1),
-                                            array("DIAGNOSIS", "diagnosis", $datahasil["diagnosis"], 1),
-                                            array("SARAN DAN RUJUKAN", "saranRujukan", $datahasil["saranRujukan"], 1),
-                                            array("CATATAN RENCANA TINDAKAN", "catatanTindakan", $datahasil["catatanTindakan"], 1),
-                                        );
-                                        _CreateWindowModalDetil($datahasil["idHasilLayanan"], "view", "viewsasaran-form", "viewsasaran-button", "", 600, "DETAIL#HASIL KONSULTASI", "", $datadetail, "", $linkurl, "");
-                                        break;
-
-                                    case '5': // Detail Edukasi
-                                        include("detailEdukasi.php");
                                         break;
 
                                     default:

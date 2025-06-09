@@ -2,10 +2,10 @@
 date_default_timezone_set('Asia/Jakarta'); // Sesuaikan dengan zona waktu server
 
 // Konfigurasi database
-$host = "localhost"; // Ganti sesuai host database Anda
+$host = "localhost"; // Host database Anda
 $dbname = "emr_pinilih"; // Nama database
-$username = "root"; // Ganti sesuai username database Anda
-$password = ""; // Ganti sesuai password database Anda
+$username = "root"; // Username database Anda
+$password = ""; // Password database Anda
 
 try {
     // Membuat koneksi menggunakan PDO

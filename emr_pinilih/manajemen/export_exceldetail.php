@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Asia/Jakarta');
+
 require '../vendor/autoload.php'; // Path ke PhpSpreadsheet (jika menggunakan composer)
 
 // Gunakan namespace PhpSpreadsheet
@@ -47,9 +49,7 @@ if (empty($datahasil)) {
 // Definisi kolom hasil layanan per program
 $kolomPerProgram = [
     1 => ["areaTubuh"],
-    2 => ["tingkatNyeri", "waktuMunculKeluhan", "sifatSakit", "obat", "posturTubuh", "ROM", "positive", "management"],
-    3 => ["tanggalRujukan", "alasanRujukan", "tinggiBadan", "beratBadan", "tekananDarah", "gulaDarah", "kolesterol", "trigliserida", "benjolanPayudara", "inspeksiVisualAsamAsetat", "kadarAlkoholPernafasan", "tesAmfetaminUrin", "arusPernafasanEkspirasi", "faktorResikoPerilaku"],
-    4 => ["saranRujukan"]
+    2 => ["tingkatNyeri", "waktuMunculKeluhan", "sifatSakit", "obat", "posturTubuh", "ROM", "positive", "management"]
 ];
 
 // Mapping nama kolom ke teks deskriptif
@@ -62,22 +62,7 @@ $namaKolom = [
     "posturTubuh" => "Postur Tubuh",
     "ROM" => "Range of Motion (ROM)",
     "positive" => "Positive",
-    "management" => "Management",
-    "tanggalRujukan" => "Tanggal Rujukan",
-    "alasanRujukan" => "Alasan Rujukan",
-    "tinggiBadan" => "Tinggi Badan (cm)",
-    "beratBadan" => "Berat Badan (kg)",
-    "tekananDarah" => "Tekanan Darah (mmHg)",
-    "gulaDarah" => "Gula Darah (mg/dL)",
-    "kolesterol" => "Kolesterol (mg/dL)",
-    "trigliserida" => "Trigliserida (mg/dL)",
-    "benjolanPayudara" => "Benjolan Payudara",
-    "inspeksiVisualAsamAsetat" => "Inspeksi Visual Asam Asetat",
-    "kadarAlkoholPernafasan" => "Kadar Alkohol Pernafasan",
-    "tesAmfetaminUrin" => "Tes Amfetamin Urin",
-    "arusPernafasanEkspirasi" => "Arus Pernafasan Ekspirasi",
-    "faktorResikoPerilaku" => "Faktor Resiko Perilaku",
-    "saranRujukan" => "Saran Rujukan"
+    "management" => "Management"
 ];
 
 $spreadsheet = new Spreadsheet();
@@ -89,7 +74,7 @@ $dataPasien = $view->vViewData($sqlPasien);
 $namaPasien = $dataPasien[0]['namaLengkap'] ?? 'Tidak Diketahui';
 
 // Ambil tanggal saat ini
-$tanggalCetak = date("d-m-Y H:i", strtotime("+6 hours"));
+$tanggalCetak = date("d-m-Y H:i");
 
 // Judul laporan
 $judul = "Detail Rekam Medis Pasien: $namaPasien";

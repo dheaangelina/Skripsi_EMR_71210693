@@ -92,7 +92,6 @@
             <div class="col-md-12">
                 <?php
                 $sqlterapis = "SELECT t.* FROM terapis t ORDER BY idTerapis DESC";
-                // echo $sqlterapis;
                 $view = new cView();
                 $arrayterapis = $view->vViewData($sqlterapis);
                 ?>
@@ -125,20 +124,23 @@
                                         //jenisTerapis
                                         $labelJenisTerapis = isset($enumJTMapping[$dataterapis["jenisTerapis"]]) ? $enumJTMapping[$dataterapis["jenisTerapis"]] : $dataterapis["jenisTerapis"];
                                         
-                                        // Path file DOKUMENTASI SERTIFIKASI
-                                        $dokumenPath = "uploads/sertifikasi/" . basename($dataterapis["dokumenSertifikasi"]);
+                                        // File dokumenSertifikasi
+                                        $dokumenPath = "../admin/" . $dataterapis["dokumenSertifikasi"];
+                                        $pathForCheck = __DIR__ . "/../admin/" . $dataterapis["dokumenSertifikasi"]; // untuk file_exists()
 
-                                        if (!empty($dataterapis["dokumenSertifikasi"]) && file_exists($dokumenPath)) {
-                                            $dokumenSertifikasi = '<a href="../manajemen/' . htmlspecialchars($dokumenPath) . '" target="_new">Lihat Dokumen</a>';
+                                        if (!empty($dataterapis["dokumenSertifikasi"]) && file_exists($pathForCheck)) {
+                                            $dokumenSertifikasi = '<a href="' . htmlspecialchars($dokumenPath) . '" target="_blank">Lihat Dokumen</a>';
                                         } else {
                                             $dokumenSertifikasi = '<span>Tidak ada dokumen</span>';
                                         }
 
-                                        // Path file DOKUMENTASI SERTIFIKASI
-                                        $dokumenPath2 = "uploads/sertifikasi/" . basename($dataterapis["dokumenLainnya"]);
+                                        // File dokumenLainnya
+                                        // __DIR__ = folder saat ini (manajemen/)
+                                        $dokumenPath2 = "../admin/" . $dataterapis["dokumenLainnya"];
+                                        $pathForCheck2 = __DIR__ . "/../admin/" . $dataterapis["dokumenLainnya"];
 
-                                        if (!empty($dataterapis["dokumenLainnya"]) && file_exists($dokumenPath2)) {
-                                            $dokumenLainnya = '<a href="../manajemen/' . htmlspecialchars($dokumenPath2) . '" target="_new">Lihat Dokumen</a>';
+                                        if (!empty($dataterapis["dokumenLainnya"]) && file_exists($pathForCheck2)) {
+                                            $dokumenLainnya = '<a href="' . htmlspecialchars($dokumenPath2) . '" target="_blank">Lihat Dokumen</a>';
                                         } else {
                                             $dokumenLainnya = '<span>Tidak ada dokumen</span>';
                                         }

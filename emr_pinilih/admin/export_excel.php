@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Asia/Jakarta');
+
 include_once("../_function_i/cView.php");
 include_once("../_function_i/cConnect.php");
 
@@ -43,13 +45,13 @@ $sql .= " GROUP BY p.idPasien";
 $dataPasien = $view->vViewData($sql);
 
 // Mendapatkan tanggal cetak
-$tanggalCetak = date("d-m-Y H:i", strtotime("+6 hours"));
+$tanggalCetak = date("d-m-Y H:i");
 
 // Menampilkan judul laporan
 echo "<table border='1'>";
-echo "<tr><th colspan='9' style='text-align:center; font-weight:bold;'>LAPORAN DATA PASIEN</th></tr>";
-echo "<tr><th colspan='9' style='text-align:center;'>Tanggal Cetak: $tanggalCetak</th></tr>";
-echo "<tr><td colspan='9'></td></tr>";
+echo "<tr><th colspan='10' style='text-align:center; font-weight:bold;'>LAPORAN DATA PASIEN</th></tr>";
+echo "<tr><th colspan='10' style='text-align:center;'>Tanggal Cetak: $tanggalCetak</th></tr>";
+echo "<tr><td colspan='10'></td></tr>";
 
 // Header tabel
 echo "<tr>

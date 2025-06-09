@@ -170,8 +170,9 @@ if (!empty($_POST["btnhapus"])) {
         <script>
         document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("pilihJD").addEventListener("change", function () {
+                // Jenis Disabilitas Baru
                 if (this.value === "baru") {
-                    // Sembunyikan hanya dropdown, tetapi biarkan input sub jenis tetap terlihat
+                    // Sembunyikan dropdown, tetapi biarkan input sub jenis tetap terlihat
                     document.getElementById("selectDisabilitasContainer").style.display = "none";
                     document.getElementById("formDisabilitasBaru").style.display = "block";
 
@@ -182,12 +183,13 @@ if (!empty($_POST["btnhapus"])) {
 
                     // Pastikan nama input sub jenis tetap sesuai agar terkirim dalam form
                     document.getElementById("namaDisabilitasBaru").setAttribute("name", "namaDisabilitas");
+                // Hanya sub jenis disabilitas yang baru
                 } else {
-                    // Jika memilih jenis yang ada, tampilkan kembali dropdown
+                    // Jika memilih jenis yang ada, tampilkan dropdown
                     document.getElementById("selectDisabilitasContainer").style.display = "block";
                     document.getElementById("formDisabilitasBaru").style.display = "none";
 
-                    // Matikan kembali input jenis disabilitas baru
+                    // Matikan input jenis disabilitas baru
                     document.querySelectorAll("#formDisabilitasBaru input").forEach(el => {
                         el.setAttribute("disabled", "true");
                     });

@@ -25,8 +25,8 @@ $conn->goConnect();
 
     <style>
         .custom-dark-blue {
-            border-color:rgb(43, 80, 135) !important;
-            color:rgb(33, 87, 168) !important; 
+            border-color:rgb(37, 99, 191) !important;
+            color:rgb(6, 38, 85) !important; 
         }
     </style>
 </head>
@@ -95,23 +95,24 @@ $conn->goConnect();
 </div>
 <br><br>
 
-<div class="row justify-content-center">
-    <div class="col-5">
+<div class="row mx-1 justify-content-center">
+    <div class="col-6">
         <!-- JENIS DISABILITAS -->
-        <div class="card text-center border border-2" style="height: 380px;">
+        <div class="card text-center border border-2" style="height: 430px;">
             <div class="card-body" >
                 <button onclick="exportToExcel('chartJD', 'Jenis Disabilitas')" class="btn btn-success mb-2 btn-sm ">
                     <i class="fa-solid fa-print"></i> CETAK EXCEL
                 </button>
                 <h5>Jenis Disabilitas Pasien</h5>
+                <br>
                 <canvas id="chartJD"></canvas>
             </div>
         </div>
     </div>
     
-    <div class="col-5">
+    <div class="col-6">
         <!-- SUB DISABILITAS -->
-        <div class="card text-center border border-2" style="height: 380px;">
+        <div class="card text-center border border-2" style="height: 430px;">
             <div class="card-body ">
                 <button onclick="exportToExcel('chartSubJD', 'Sub Jenis Disabilitas')" class="btn btn-success mb-2 btn-sm">
                     <i class="fa-solid fa-print"></i> CETAK EXCEL
@@ -125,20 +126,19 @@ $conn->goConnect();
     <script>
     $(document).ready(function() {
         var chartJD, chartSubJD;
-        // Load chart utama saat halaman dimuat
-        loadChartJD();
-        loadEmptyChartSubJD(); // Menampilkan chart kosong
+        loadChartJD(); //Chart Jenis Disabilitas
+        loadEmptyChartSubJD(); // Chart Sub Jenis Disabilitas kosong
 
-        // Fungsi untuk memuat chart utama (Jenis Disabilitas)
+        // Chart Jenis Disabilitas
         function loadChartJD() {
             $.ajax({
-                url: 'chartDisabilitas.php',
+                url: 'chartDisabilitas.php', // Ambil data dari chartDisabilitas.php pakai AJAX
                 type: 'GET',
                 dataType: 'json',
                 success: function(response) {
                     var ctx = document.getElementById('chartJD').getContext('2d');
 
-                    // Simpan ID jenis disabilitas dari respons
+                    // Simpan ID jenis disabilitas untuk ketika diklik
                     var idJenisList = response.ids;
                     if (chartJD) {
                         chartJD.destroy();
@@ -146,17 +146,17 @@ $conn->goConnect();
                     chartJD = new Chart(ctx, {
                         type: 'bar',
                         data: {
-                            labels: response.labels,
-                            datasets: [{
+                            labels: response.labels, //nama JD
+                            datasets: [{ // jumlah pasien per JD
                                 label: 'Jenis Disabilitas',
-                                data: response.datas,
+                                data: response.datas, 
                                 backgroundColor: 'rgba(54, 162, 235, 0.5)',
                                 borderColor: 'rgba(54, 162, 235, 1)',
                                 borderWidth: 1
                             }]
                         },
                         options: {
-                            responsive: true,
+                            responsive: true, // ukuran layar
                             plugins: {
                                 datalabels: {
                                     anchor: 'end',
@@ -167,6 +167,9 @@ $conn->goConnect();
                                         size: 14
                                     },
                                     color: '#000'
+                                },
+                                legend: {
+                                    display: false
                                 }
                             },
                             scales: {
@@ -182,9 +185,9 @@ $conn->goConnect();
                             },
                             onClick: function(event, elements) {
                                 if (elements.length > 0) {
-                                    var index = elements[0].index;
-                                    var idJenisDisabilitas = idJenisList[index]; // Gunakan ID yang benar
-                                    loadChartSubJD(idJenisDisabilitas);
+                                    var index = elements[0].index; 
+                                    var idJenisDisabilitas = idJenisList[index]; // ambil idJD pada bar pertama yang diklik
+                                    loadChartSubJD(idJenisDisabilitas); // klik bar pada JD untuk menampilkan sub JD
                                 }
                             }
                         },
@@ -214,6 +217,11 @@ $conn->goConnect();
                 },
                 options: {
                     responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
                     scales: {        
                         x: {
                             display: true,
@@ -228,7 +236,7 @@ $conn->goConnect();
             });
         }
 
-        // Fungsi untuk memuat chart sub jenis disabilitas
+        // Fungsi untuk memuat chart sub jenis disabilitas dengan mengirim idJenisDisabilitas ke chartSubDisabilitas.php
         function loadChartSubJD(idJenisDisabilitas) {
             $.ajax({
                 url: 'chartSubDisabilitas.php',
@@ -264,6 +272,9 @@ $conn->goConnect();
                                         size: 14
                                     },
                                     color: '#000'
+                                },
+                                legend: {
+                                    display: false
                                 }
                             },
                             scales: {        
@@ -290,46 +301,39 @@ $conn->goConnect();
     </script>
 
     <script>
-    function exportToExcel(chartId, sheetName, filterText = "") {
-        var chart = Chart.getChart(chartId); // Ambil grafik berdasarkan ID
+    function exportToExcel(chartId, sheetName) {
+        var chart = Chart.getChart(chartId);
         if (!chart) {
             alert("Grafik tidak ditemukan!");
             return;
         }
 
-        var labels = chart.data.labels; // Ambil label sumbu X
-        var datas = chart.data.datasets[0].data; // Ambil data jumlah pasien
+        var labels = chart.data.labels; // sumbu X
+        var datas = chart.data.datasets[0].data; // sumbu Y
 
-        // Tambahkan judul dan header dengan pemformatan lebih rapi
         var dataExcel = [
-            [sheetName.toUpperCase()], // Judul laporan (huruf besar)
+            [sheetName.toUpperCase()], // Judul
             [],                        // Baris kosong
             ["Kategori", "Jumlah Pasien"] // Header tabel
         ];
-
-        // Jika ada filter, tambahkan info jenis disabilitas
-        if (filterText) {
-            dataExcel.splice(1, 0, ["Jenis Disabilitas:", filterText]);
-        }
 
         // Masukkan data ke dalam Excel
         for (var i = 0; i < labels.length; i++) {
             dataExcel.push([labels[i], datas[i]]);
         }
 
-        // Buat sheet Excel
+        // Buat worksheet Excel
         var ws = XLSX.utils.aoa_to_sheet(dataExcel);
 
-        // Auto-width untuk kolom agar tidak kepotong
         var wsCols = [
-            { wch: 30 }, // Lebar kolom pertama (Kategori)
-            { wch: 15 }  // Lebar kolom kedua (Jumlah Pasien)
+            { wch: 30 }, // Lebar kolom Kategori
+            { wch: 15 }  // Lebar kolom Jumlah Pasien
         ];
         ws['!cols'] = wsCols;
 
-        //  Tambahkan bold pada header dan judul
+        // header dan judul
         var titleCell = ws["A1"];
-        if (titleCell) titleCell.s = { font: { bold: true, sz: 14 } }; // Judul besar
+        if (titleCell) titleCell.s = { font: { bold: true, sz: 14 } };
 
         var headerCell1 = ws["A3"], headerCell2 = ws["B3"];
         if (headerCell1) headerCell1.s = { font: { bold: true } };
@@ -346,302 +350,312 @@ $conn->goConnect();
 
 <!-- pie chart -->
 <div class="row mx-2 justify-content-center">
-        <div class="col-4">
-            <!-- KELOMPOK USIA -->
-            <div class="card text-center border border-2">
-                <div class="card-body">
-                    <button onclick="exportUsiaToExcel()" class="btn btn-success btn-sm mb-2">
-                        <i class="fa-solid fa-print" style="color: #ffffff;"></i> CETAK EXCEL
-                    </button>
-                    <h5 class="text-center">Kelompok Usia Pasien</h5>
-                    <canvas id="chartUsia"></canvas>
-                </div>
+    <div class="col-4">
+        <!-- KELOMPOK USIA -->
+        <div class="card text-center border border-2">
+            <div class="card-body">
+                <button onclick="exportUsiaToExcel()" class="btn btn-success btn-sm mb-2">
+                    <i class="fa-solid fa-print" style="color: #ffffff;"></i> CETAK EXCEL
+                </button>
+                <h5 class="text-center">Kelompok Usia Pasien</h5>
+                <canvas id="chartUsia"></canvas>
             </div>
         </div>
-        <?php
-        $sql = "SELECT * FROM vKelompokUsia";
-        $view = new cView();
-        $arrayhasil = $view->vViewData($sql);
+    </div>
+    <?php
+    $sql = "SELECT * FROM vKelompokUsia";
+    $view = new cView();
+    $arrayhasil = $view->vViewData($sql);
 
-        $labels = [];
-        $datas = [];
-        $total = 0;
+    $labels = [];
+    $datas = [];
+    $total = 0;
 
-        foreach ($arrayhasil as $value) {
-            $namaKelompok = trim($value["kelompokUsia"]);
-            $jumlah = (int) $value["jumlah"];
+    foreach ($arrayhasil as $value) {
+    $labels[] = trim($value["kelompokUsia"]); // kelompok usia
+    $datas[] = (int) $value["jumlah"]; //jumlah pasien
+    $total += (int) $value["jumlah"]; // total keseluruhan
+    }
 
-            $labels[] = $namaKelompok;
-            $datas[] = $jumlah;
-            $total += $jumlah;
-        }
+    // Urutin dari besar ke kecil
+    array_multisort($datas, SORT_DESC, $labels);
 
-        $labels = json_encode($labels, JSON_UNESCAPED_UNICODE);
-        $datas = json_encode($datas);
-        $total = max($total, 1); // Mencegah pembagian dengan nol
-        ?>
+    //konversi php ke json
+    $labels = json_encode($labels, JSON_UNESCAPED_UNICODE);
+    $datas = json_encode($datas);
+    $total = max($total, 1);
+    ?>
 
-        <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var ctx = document.getElementById("chartUsia").getContext("2d");
-            var labels = <?= $labels; ?>;
-            var dataValues = <?= $datas; ?>;
-            var total = <?= $total; ?>;
+    <script>
+    function getDynamicColors(values, total, baseColor) {
+        const targetColors = { //warna dasar utk usia, kelurahan, dan goldar
+            'rgba(2, 32, 92, 0.8)': { r: 135, g: 206, b: 250 }, 
+            'rgba(0, 103, 48, 0.8)': { r: 144, g: 238, b: 144 },
+            'rgba(153, 0, 0, 0.8)': { r: 255, g: 182, b: 193 }  
+        };
 
-            console.log("Labels:", labels);
-            console.log("Data Values:", dataValues);
-            console.log("Total Pasien:", total);
+        // ambil RGB
+        var match = baseColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+        var baseR = parseInt(match[1]);
+        var baseG = parseInt(match[2]);
+        var baseB = parseInt(match[3]);
 
-            var colors = [
-                "rgba(176, 214, 254, 0.8)",  
-                "rgba(132, 192, 251, 0.8)", 
-                "rgba(102, 153, 255, 0.8)", 
-                "rgba(51, 102, 204, 0.8)", 
-                "rgba(0, 51, 153, 0.8)" 
-            ];
-            // Cek apakah chart sudah ada, jika ada maka hapus dulu sebelum membuat yang baru
-            if (window.chartUsia instanceof Chart) {
-                window.chartUsia.destroy();
+        var target = targetColors[baseColor] || { r: 255, g: 255, b: 255 }; // fallback putih kalau baseColor gak ada
+
+        return values.map(function(value, index) {
+            if (index === 0) { // data pertama pake warna dasar
+                return baseColor; 
             }
 
-            window.chartUsia = new Chart(ctx, {
-                type: "pie",
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: dataValues,
-                        backgroundColor: colors,
-                        borderColor: "#fff",
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: "bottom",
-                            labels: {
-                                font: {
-                                    size: 10 // Sesuaikan ukuran
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function (tooltipItem) {
-                                    var jumlah = dataValues[tooltipItem.dataIndex] || 0;
-                                    var persentase = ((jumlah / total) * 100).toFixed(1);
-                                    return jumlah + " pasien (" + persentase + "%)";
-                                }
-                            }
-                        },
-                        datalabels: {
-                            color: '#fff',
-                            font: { weight: 'bold', size: 15 },
-                            anchor: 'center', // Pusat label di dalam pie
-                            align: 'center',
-                            formatter: function(value, context) {
-                                var persentase = ((value / total) * 100).toFixed(1);
-                                return value + " pasien \n (" + persentase + "%)";
-                            }
-                        }
-                    }
-                },
-                plugins: [ChartDataLabels]
-            });
+            //buat gradasinya 
+            var ratio = index / (values.length - 1);
+            var r = Math.round(baseR + (target.r - baseR) * ratio);
+            var g = Math.round(baseG + (target.g - baseG) * ratio);
+            var b = Math.round(baseB + (target.b - baseB) * ratio);
+
+            return 'rgb(' + r + ',' + g + ',' + b + ')';
         });
-        </script>
+    }
 
-        <div class="col-4">
-            <!-- WILAYAH -->
-            <div class="card text-center border border-2">
-                <div class="card-body">
-                    <button onclick="exportKelurahanToExcel()" class="btn btn-success btn-sm mb-2">
-                        <i class="fa-solid fa-print" style="color: #ffffff;"></i> CETAK EXCEL
-                    </button>
-                    <h5 class="text-center">Kelurahan Domisili Pasien</h5>
-                    <canvas id="chartKelurahan"></canvas>
-                </div>
-            </div>
-        </div>
-        <?php
-        $sql = "SELECT k.namaKelurahan, COUNT(p.idPasien) AS jumlah
-                FROM pasien p
-                JOIN kelurahan k ON p.idKelurahanDomisili = k.idKelurahan
-                WHERE p.idKelurahanDomisili IN (40579, 40580, 40581, 40582)
-                GROUP BY p.idKelurahanDomisili";
-        $view = new cView();
-        $arrayhasil = $view->vViewData($sql);
+    document.addEventListener("DOMContentLoaded", function () {
+        var ctxUsia = document.getElementById("chartUsia").getContext("2d");
+        var labelsUsia = <?= $labels; ?>;
+        var dataValuesUsia = <?= $datas; ?>;
+        var totalUsia = <?= $total; ?>;
 
-        $labels = [];
-        $datas = [];
-        $total = 0;
+        var warnaUsia = getDynamicColors(dataValuesUsia, totalUsia, 'rgba(2, 32, 92, 0.8)');
 
-        foreach ($arrayhasil as $value) {
-            $namaKelurahan = trim($value["namaKelurahan"]);
-            $jumlah = (int) $value["jumlah"];
-
-            $labels[] = $namaKelurahan;
-            $datas[] = $jumlah;
-            $total += $jumlah;
+        if (window.chartUsia instanceof Chart) {
+            window.chartUsia.destroy();
         }
 
-        $labels = json_encode($labels, JSON_UNESCAPED_UNICODE);
-        $datas = json_encode($datas);
-        $total = max($total, 1); // Mencegah pembagian dengan nol
-        ?>
-
-        <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var ctx = document.getElementById("chartKelurahan").getContext("2d");
-            var labels = <?= $labels; ?>;
-            var dataValues = <?= $datas; ?>;
-            var total = <?= $total; ?>;
-
-            console.log("Labels:", labels);
-            console.log("Data Values:", dataValues);
-            console.log("Total Pasien:", total);
-
-            var colors = [
-                "rgb(166, 249, 162)", 
-                "rgb(105, 205, 106)", 
-                "rgb(68, 161, 65)", 
-                "rgba(25, 90, 25, 0.84)" 
-            ];
-            // Cek apakah chart sudah ada, jika ada maka hapus dulu sebelum membuat yang baru
-            if (window.chartKelurahan instanceof Chart) {
-                window.chartKelurahan.destroy();
-            }
-
-            window.chartKelurahan = new Chart(ctx, {
-                type: "pie",
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: dataValues,
-                        backgroundColor: colors,
-                        borderColor: "#fff",
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: "bottom"
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function (tooltipItem) {
-                                    var jumlah = dataValues[tooltipItem.dataIndex] || 0;
-                                    var persentase = ((jumlah / total) * 100).toFixed(1);
-                                    return jumlah + " pasien (" + persentase + "%)";
-                                }
-                            }
-                        },
-                        datalabels: {
-                            color: '#fff',
-                            font: { weight: 'bold', size: 15 },
-                            anchor: 'center', // Pusat label di dalam pie
-                            align: 'center',
-                            formatter: function(value, context) {
-                                var persentase = ((value / total) * 100).toFixed(1);
-                                return value + " pasien \n (" + persentase + "%)";
+        window.chartUsia = new Chart(ctxUsia, {
+            type: "pie",
+            data: {
+                labels: labelsUsia,
+                datasets: [{
+                    data: dataValuesUsia,
+                    backgroundColor: warnaUsia,
+                    borderColor: "#fff",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: { font: { size: 10 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                var jumlah = dataValuesUsia[tooltipItem.dataIndex] || 0;
+                                var persentase = ((jumlah / totalUsia) * 100).toFixed(1);
+                                return jumlah + " pasien (" + persentase + "%)";
                             }
                         }
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        font: { weight: 'bold', size: 15 },
+                        anchor: 'center',
+                        align: 'center',
+                        formatter: function(value) {
+                            var persentase = ((value / totalUsia) * 100).toFixed(1);
+                            return persentase + "%";
+                        }
                     }
-                },
-                plugins: [ChartDataLabels]
-            });
-        });
-        </script>
-       
-        <div class="col-4">
-            <!-- GOLONGAN DARAH -->
-            <div class="card text-center border border-2">
-                <div class="card-body">
-                    <button onclick="exportGoldarToExcel()" class="btn btn-success btn-sm mb-2">
-                        <i class="fa-solid fa-print" style="color: #ffffff;"></i> CETAK EXCEL
-                    </button>
-                    <h5 class="text-center">Golongan Darah Pasien</h5>
-                    <canvas id="chartGoldar"></canvas>
-                </div>
-            </div>
-
-
-            <?php
-                $sql = "SELECT * FROM vGolonganDarah";
-                $view = new cView();
-                $arrayhasil = $view->vViewData($sql);
-
-                $labels = [];
-                $datas = [];
-                $total = 0;
-
-                foreach ($arrayhasil as $value) {
-                    $labels[] = $value["golonganDarah"];
-                    $datas[] = $value["jumlah"];
-                    $total += $value["jumlah"];
                 }
+            },
+            plugins: [ChartDataLabels]
+        });
+    });
+    </script>
 
-                $labels = json_encode($labels);
-                $datas = json_encode($datas);
-                $total = max($total, 1); // Mencegah pembagian dengan nol
-            ?>
+    <div class="col-4">
+        <!-- WILAYAH -->
+        <div class="card text-center border border-2">
+            <div class="card-body">
+                <button onclick="exportKelurahanToExcel()" class="btn btn-success btn-sm mb-2">
+                    <i class="fa-solid fa-print" style="color: #ffffff;"></i> CETAK EXCEL
+                </button>
+                <h5 class="text-center">Kelurahan Domisili Pasien</h5>
+                <canvas id="chartKelurahan"></canvas>
+            </div>
+        </div>
+    </div>
+    <?php
+    $sql = "SELECT k.namaKelurahan, COUNT(p.idPasien) AS jumlah
+            FROM pasien p
+            JOIN kelurahan k ON p.idKelurahanDomisili = k.idKelurahan
+            WHERE p.idKelurahanDomisili IN (40579, 40580, 40581, 40582)
+            GROUP BY p.idKelurahanDomisili";
+    $view = new cView();
+    $arrayhasil = $view->vViewData($sql);
 
-            <script>
-                var ctx = document.getElementById('chartGoldar').getContext('2d');
-                var labels = <?= $labels; ?>;
-                var dataValues = <?= $datas; ?>;
-                var total = <?= $total; ?>;
+    $labels = [];
+    $datas = [];
+    $total = 0;
 
-                var colors = [
-                    'rgba(153, 0, 0, 0.8)',  
-                    'rgba(204, 51, 51, 0.8)', 
-                    'rgba(255, 102, 102, 0.8)', 
-                    'rgba(255, 153, 153, 0.8)'
-                ];
+    foreach ($arrayhasil as $value) {
+    $labels[] = trim($value["namaKelurahan"]);
+    $datas[] = (int) $value["jumlah"];
+    $total += (int) $value["jumlah"];
+    }
 
-                var chartGoldar = new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: dataValues,
-                            backgroundColor: colors,
-                            borderColor: '#fff',
-                            borderWidth: 2
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { position: 'bottom' }, // 👈 Hapus legend default
-                            tooltip: {
-                                callbacks: {
-                                    label: function(tooltipItem) {
-                                        var jumlah = dataValues[tooltipItem.dataIndex];
-                                        var persentase = ((jumlah / total) * 100).toFixed(1);
-                                        return jumlah + " pasien (" + persentase + "%)";
-                                    }
-                                }
-                            },
-                            datalabels: {
-                                color: '#fff',
-                                font: { weight: 'bold', size: 15 },
-                                anchor: 'center', // Pusat label di dalam pie
-                                align: 'center',
-                                formatter: function(value, context) {
-                                    var persentase = ((value / total) * 100).toFixed(1);
-                                    return value + " pasien \n (" + persentase + "%)";
-                                }
+    // Urutin dari besar ke kecil
+    array_multisort($datas, SORT_DESC, $labels);
+
+    $labels = json_encode($labels, JSON_UNESCAPED_UNICODE);
+    $datas = json_encode($datas);
+    $total = max($total, 1);
+    ?>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var ctxKelurahan = document.getElementById("chartKelurahan").getContext("2d");
+        var labelsKelurahan = <?= $labels; ?>;
+        var dataValuesKelurahan = <?= $datas; ?>;
+        var totalKelurahan = <?= $total; ?>;
+
+        var warnaKelurahan = getDynamicColors(dataValuesKelurahan, totalKelurahan, 'rgba(0, 103, 48, 0.8)');
+
+        if (window.chartKelurahan instanceof Chart) {
+            window.chartKelurahan.destroy();
+        }
+
+        window.chartKelurahan = new Chart(ctxKelurahan, {
+            type: "pie",
+            data: {
+                labels: labelsKelurahan,
+                datasets: [{
+                    data: dataValuesKelurahan,
+                    backgroundColor: warnaKelurahan,
+                    borderColor: "#fff",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: "bottom" },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                var jumlah = dataValuesKelurahan[tooltipItem.dataIndex] || 0;
+                                var persentase = ((jumlah / totalKelurahan) * 100).toFixed(1);
+                                return jumlah + " pasien (" + persentase + "%)";
                             }
                         }
                     },
-                    plugins: [ChartDataLabels] // 👈 Aktifkan Data Labels hanya untuk chart ini
-                });
-            </script>
+                    datalabels: {
+                        color: '#fff',
+                        font: { weight: 'bold', size: 15 },
+                        anchor: 'center',
+                        align: 'center',
+                        formatter: function(value) {
+                            var persentase = ((value / totalKelurahan) * 100).toFixed(1);
+                            return persentase + "%";
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    });
+    </script>
+
+    <div class="col-4">
+        <!-- GOLONGAN DARAH -->
+        <div class="card text-center border border-2">
+            <div class="card-body">
+                <button onclick="exportGoldarToExcel()" class="btn btn-success btn-sm mb-2">
+                    <i class="fa-solid fa-print" style="color: #ffffff;"></i> CETAK EXCEL
+                </button>
+                <h5 class="text-center">Golongan Darah Pasien</h5>
+                <canvas id="chartGoldar"></canvas>
+            </div>
         </div>
+
+        <?php
+        $sql = "SELECT * FROM vGolonganDarah";
+        $view = new cView();
+        $arrayhasil = $view->vViewData($sql);
+
+        $labels = [];
+        $datas = [];
+        $total = 0;
+
+        foreach ($arrayhasil as $value) {
+            $labels[] = $value["golonganDarah"];
+            $datas[] = (int) $value["jumlah"];
+            $total += (int) $value["jumlah"];
+        }
+
+        // Urutin dari besar ke kecil
+        array_multisort($datas, SORT_DESC, $labels);
+
+        $labels = json_encode($labels);
+        $datas = json_encode($datas);
+        $total = max($total, 1);
+        ?>
+
+        <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var ctxGoldar = document.getElementById('chartGoldar').getContext('2d');
+            var labelsGoldar = <?= $labels; ?>;
+            var dataValuesGoldar = <?= $datas; ?>;
+            var totalGoldar = <?= $total; ?>;
+
+            var warnaGoldar = getDynamicColors(dataValuesGoldar, totalGoldar, 'rgba(153, 0, 0, 0.8)');
+
+            if (window.chartGoldar instanceof Chart) {
+                window.chartGoldar.destroy();
+            }
+
+            window.chartGoldar = new Chart(ctxGoldar, {
+                type: 'pie',
+                data: {
+                    labels: labelsGoldar,
+                    datasets: [{
+                        data: dataValuesGoldar,
+                        backgroundColor: warnaGoldar,
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    var jumlah = dataValuesGoldar[tooltipItem.dataIndex];
+                                    var persentase = ((jumlah / totalGoldar) * 100).toFixed(1);
+                                    return jumlah + " pasien (" + persentase + "%)";
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            font: { weight: 'bold', size: 15 },
+                            anchor: 'center',
+                            align: 'center',
+                            formatter: function(value) {
+                                var persentase = ((value / totalGoldar) * 100).toFixed(1);
+                                return persentase + "%";
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        });
+        </script>
+    </div>
+</div>
 
         <script>
             function exportUsiaToExcel() {
@@ -651,7 +665,7 @@ $conn->goConnect();
                 // Format Data dengan Judul
                 var data = [
                     ["LAPORAN PASIEN BERDASARKAN KELOMPOK USIA "],  // Judul
-                    [""], // Baris kosong sebagai pemisah
+                    [""],
                     ["Kelompok Usia", "Jumlah Pasien"]  // Header
                 ];
 
@@ -688,7 +702,7 @@ $conn->goConnect();
                 // Format Data dengan Judul
                 var data = [
                     ["LAPORAN PASIEN BERDASARKAN KELURAHAN DOMISILI"],  // Judul
-                    [""], // Baris kosong sebagai pemisah
+                    [""], 
                     ["Kelurahan Domisili", "Jumlah Pasien"]  // Header
                 ];
 
@@ -725,7 +739,7 @@ $conn->goConnect();
                 // Format Data dengan Judul
                 var data = [
                     ["LAPORAN PASIEN BERDASARKAN GOLONGAN DARAH"],  // Judul
-                    [""], // Baris kosong sebagai pemisah
+                    [""],
                     ["Golongan Darah", "Jumlah Pasien"]  // Header
                 ];
 
@@ -765,7 +779,7 @@ $conn->goConnect();
         <div class="card text-center border border-2">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <button id="btnExportDistrubsiPasien" class="btn btn-success btn-sm">
+                    <button id="btnExportDistribusiPasien" class="btn btn-success btn-sm">
                         <i class="fa-solid fa-print" style="color: #ffffff;"></i> CETAK EXCEL
                     </button>
                     <h5 class="flex-grow-1 text-center">Distribusi Pasien</h5>
@@ -783,21 +797,21 @@ $conn->goConnect();
         document.addEventListener("DOMContentLoaded", function() {
             let ctx = document.getElementById('chartDistribusiPasien').getContext('2d');
             let chartDistribusi;
-            let chartData = {}; // Simpan data untuk ekspor
-            let selectedYear = ""; // Simpan tahun yang dipilih
+            let chartData = {};
+            let selectedYear = "";
             function loadChart(tahun = '') {
-                selectedYear = tahun; // Simpan tahun untuk ekspor
-                fetch(`chartDistribusiPasien.php?tahun=${tahun}`)
+                selectedYear = tahun;
+                fetch(`chartDistribusiPasien.php?tahun=${tahun}`) // ambil data JSON dgn parameter tahun
                     .then(response => response.json())
                     .then(data => {
-                        chartData = data;
+                        chartData = data; // simpan data untuk cetak Excel
                         if (chartDistribusi) {
                             chartDistribusi.destroy();
                         }
                         chartDistribusi = new Chart(ctx, {
                             type: 'line',
                             data: {
-                                labels: data.labels,
+                                labels: data.labels, // data bulan 1,2,3, ... (sumbu X)
                                 datasets: [
                                     { label: 'Fisioterapi', data: data.datasets.fisioterapi, borderColor: 'rgba(255, 99, 132, 1)', fill: false },
                                     { label: 'Kinesioterapi', data: data.datasets.kinesioterapi, borderColor: 'rgba(54, 162, 235, 1)', fill: false }
@@ -822,7 +836,7 @@ $conn->goConnect();
             function loadTahun() {
                 fetch(`getTahunDistribusi.php`)
                     .then(response => response.json())
-                    .then(data => {
+                    .then(data => { // isi filter dropdown secara dinamis
                         let select = document.getElementById('filterTahun');
                         select.innerHTML = '<option value="">Semua Tahun</option>';
                         data.forEach(tahun => {
@@ -838,8 +852,8 @@ $conn->goConnect();
                 loadChart(this.value);
             });
 
-            // EKSPOR KE EXCEL DENGAN JUDUL & FILTER
-            document.getElementById('btnExportDistrubsiPasien').addEventListener('click', function() {
+            // CETAK EXCEL
+            document.getElementById('btnExportDistribusiPasien').addEventListener('click', function() {
                 if (!chartData.labels) {
                     alert("Data belum tersedia untuk diekspor!");
                     return;
@@ -849,7 +863,7 @@ $conn->goConnect();
                 // Tambahkan JUDUL di Excel
                 worksheetData.push(["Distribusi Pasien"]);
                 worksheetData.push(["Tahun:", selectedYear || "Semua Tahun"]);
-                worksheetData.push([]); // Baris kosong untuk pemisah
+                worksheetData.push([]); 
 
                 // Header Data
                 worksheetData.push(["Bulan", "Fisioterapi", "Kinesioterapi"]);
@@ -937,9 +951,10 @@ $conn->goConnect();
                 var ctx = document.getElementById('chartTotalProgram').getContext('2d');
                 var myChart;
 
-                function loadChart(bulan = '', tahun = '') {
+                // fungsi grafik sesuai filter bulan dan tahun
+                function loadChart(bulan = '', tahun = '') { 
                     $.ajax({
-                        url: 'chartTotalProgram.php',
+                        url: 'chartTotalProgram.php', //Kirim req ke chartTotalProgram.php dengan parameter bulan dan tahun
                         type: 'GET',
                         data: { bulan: bulan, tahun: tahun },
                         dataType: 'json',
@@ -966,16 +981,13 @@ $conn->goConnect();
                                     maintainAspectRatio: false,
                                     plugins: {
                                         datalabels: {
-                                            anchor: 'end',          // Posisi di ujung
-                                            align: 'start',         // Teks di atas bar
+                                            anchor: 'end',
+                                            align: 'start',
                                             formatter: function(value, context) {
-                                                return  value; // Label di angka
+                                                return  value;
                                             },
-                                            font: {
-                                                size: 16,           // Perbesar font
-                                                weight: 'bold'
-                                            },
-                                            color: '#000'           // Warna teks hitam
+                                            font: { size: 16, weight: 'bold'},
+                                            color: '#000'
                                         },
                                         legend: {
                                             display: false
@@ -984,28 +996,16 @@ $conn->goConnect();
                                     scales: {
                                         x: {
                                             display: true,
-                                            title: {
-                                                display: true,
-                                                text: 'Program Layanan'
-                                            },
-                                            ticks: {
-                                                stepSize: 1
-                                            }
+                                            title: { display: true, text: 'Program Layanan' },
                                         },
                                         y: {
                                             display: true,
-                                            title: {
-                                                display: true,
-                                                text: 'Jumlah Program'
-                                            },
-                                            ticks: {
-                                                stepSize: 1,
-                                                precision: 0
-                                            }
+                                            title: { display: true, text: 'Jumlah Program'},
+                                            ticks: { stepSize: 1 }
                                         }
                                     }
                                 },
-                                plugins: [ChartDataLabels] // ✅ Penting: aktifkan plugin
+                                plugins: [ChartDataLabels] 
                             });
 
 
@@ -1016,81 +1016,82 @@ $conn->goConnect();
                     });
                 }
 
-                // Load chart pertama kali tanpa filter
+                // Load chart tanpa filter
                 loadChart();
 
-                // Event saat tombol filter diklik
+                // Tombol filter diklik
                 $("#btnFilter").click(function () {
                     var bulan = $("#filterMonth").val();
                     var tahun = $("#filterYear").val();
+                    // Load chart dengan bulan dan tahun
                     loadChart(bulan, tahun);
                 });
-                 });
-                 $("#btnExportTotalProgram").click(function () {
-                    var bulan = $("#filterMonth").val();
-                    var tahun = $("#filterYear").val();
+            });
 
-                    // Konversi bulan angka ke teks
-                    var bulanText = $("#filterMonth option:selected").text();
-                    var tahunText = tahun ? tahun : "Semua Tahun";
-                    var filterInfo = bulan ? `Bulan: ${bulanText}, Tahun: ${tahunText}` : `Tahun: ${tahunText}`;
+            $("#btnExportTotalProgram").click(function () {
+                var bulan = $("#filterMonth").val();
+                var tahun = $("#filterYear").val();
 
-                    $.ajax({
-                        url: 'chartTotalProgram.php',
-                        type: 'GET',
-                        data: { bulan: bulan, tahun: tahun },
-                        dataType: 'json',
-                        success: function (response) {
-                            var labels = response.labels;
-                            var datas = response.datas;
+                // ubah bulan angka ke teks untuk string filter pada judul laporan
+                var bulanText = $("#filterMonth option:selected").text();
+                var tahunText = tahun ? tahun : "Semua Tahun";
+                var filterInfo = bulan ? `Bulan: ${bulanText}, Tahun: ${tahunText}` : `Tahun: ${tahunText}`;
+
+                $.ajax({
+                    url: 'chartTotalProgram.php',
+                    type: 'GET',
+                    data: { bulan: bulan, tahun: tahun },
+                    dataType: 'json',
+                    success: function (response) {
+                        var labels = response.labels;
+                        var datas = response.datas;
                         
-                            // Buat data Excel dalam format array
-                            var excelData = [
-                                ["Total Program Layanan"],   // Judul laporan
-                                [filterInfo],                // Informasi filter
-                                [],                          // Baris kosong
-                                ["No", "Nama Program", "Total"] // Header tabel
-                            ];
+                        // Buat data Excel dalam format array
+                        var excelData = [
+                            ["Total Program Layanan"],   // Judul
+                            [filterInfo],                // Informasi filter
+                            [],                          
+                            ["Nama Program", "Total"] // Header
+                        ];
+                    
+                        // Tambahkan data program layanan
+                        labels.forEach((label, index) => {
+                            excelData.push([label, datas[index]]);
+                        });
                         
-                            // Tambahkan data program layanan
-                            labels.forEach((label, index) => {
-                                excelData.push([index + 1, label, datas[index]]);
-                            });
+                        // Buat worksheet
+                        var ws = XLSX.utils.aoa_to_sheet(excelData);
+                    
+                        // Merge cell untuk judul dan informasi filter
+                        ws["!merges"] = [
+                            { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }, // Judul
+                            { s: { r: 1, c: 0 }, e: { r: 1, c: 2 } }  // Info filter
+                        ];
                         
-                            // Buat worksheet
-                            var ws = XLSX.utils.aoa_to_sheet(excelData);
+                        // Atur lebar kolom
+                        ws["!cols"] = [
+                            { wch: 30 },  // Nama Program
+                            { wch: 10 }   // Total
+                        ];
                         
-                            // Merge cell untuk judul dan informasi filter
-                            ws["!merges"] = [
-                                { s: { r: 0, c: 0 }, e: { r: 0, c: 2 } }, // Judul di baris pertama
-                                { s: { r: 1, c: 0 }, e: { r: 1, c: 2 } }  // Info filter di baris kedua
-                            ];
+                        // Rata kiri pada semua sel
+                        Object.keys(ws).forEach(cell => {
+                            if (cell[0] !== '!') { 
+                                ws[cell].s = { alignment: { horizontal: "left" } };
+                            }
+                        });
                         
-                            // Atur lebar kolom agar lebih rapi
-                            ws["!cols"] = [
-                                { wch: 5 },   // Kolom "No"
-                                { wch: 30 },  // Kolom "Nama Program"
-                                { wch: 10 }   // Kolom "Total"
-                            ];
-                        
-                            // **Terapkan alignment rata kiri ke semua sel**
-                            Object.keys(ws).forEach(cell => {
-                                if (cell[0] !== '!') { // Hindari properti metadata (!cols, !merges, dll.)
-                                    ws[cell].s = { alignment: { horizontal: "left" } };
-                                }
-                            });
-                        
-                            // Buat workbook & simpan file
-                            var wb = XLSX.utils.book_new();
-                            XLSX.utils.book_append_sheet(wb, ws, "Total Program");
-                            XLSX.writeFile(wb, "Laporan_Total_Program.xlsx");
-                        },
-                        error: function(xhr, status, error) {
-                            console.error("AJAX Error:", status, error);
-                        }
-                    });
+                        // Buat workbook & simpan file
+                        var wb = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(wb, ws, "Total Program");
+                        XLSX.writeFile(wb, "Laporan_Total_Program.xlsx");
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error:", status, error);
+                    }
                 });
-            </script>
+            });
+        </script>
         </div>
     </div>
 </div>

@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mail->Port = 587;
         $mail->setFrom('rkdpinilih@gmail.com', 'Support - Rekam Medis RKD Pinilih');
         $mail->addAddress($email);
-        $mail->Subject = 'Kode OTP Reset Password';
+        $mail->Subject = 'Kode OTP Reset Password EMR Pinilih';
         $mail->Body = "Kode OTP Anda: $otp\nKode ini berlaku selama 10 menit.";
 
         if ($mail->send()) {

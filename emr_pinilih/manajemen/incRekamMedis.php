@@ -23,29 +23,21 @@ include_once("../_function_i/inc_f_object.php");
 
 <?php
 // Proses Filtering Data
-// Perbarui query dengan alias untuk jenisKelamin agar tidak terjadi duplikasi
-$sql = "SELECT p.*, sd.*, jd.* FROM pasien p
+$sql = "SELECT p.*, sd.*, jd.*, k.namaKelurahan 
+        FROM pasien p
         JOIN sub_disabilitas sd ON sd.idSubDisabilitas = p.idSubDisabilitas
-        JOIN jenis_disabilitas jd ON jd.idJenisDisabilitas = sd.idJenisDisabilitas";
-
+        JOIN jenis_disabilitas jd ON jd.idJenisDisabilitas = sd.idJenisDisabilitas
+        LEFT JOIN kelurahan k ON k.idKelurahan = p.idKelurahanDomisili";
 $where = [];
 
 // Filter Kelompok Usia
-// Cek apakah variabel POST "kelompokUsia" tidak kosong
 if (!empty($_POST["kelompokUsia"])) {
-    // Simpan nilai dari input "kelompokUsia" ke dalam variabel $selectedUsia
     $selectedUsia = $_POST["kelompokUsia"];
-    // Periksa apakah nilai $selectedUsia berupa array (artinya pengguna memilih lebih dari satu opsi)
     if (is_array($selectedUsia)) {
-        // Menghapus spasi ekstra dari setiap elemen dalam array $selectedUsia
         $selectedUsia = array_map('trim', $selectedUsia);
-        // Menggabungkan elemen array menjadi sebuah string dengan format: 'nilai1','nilai2',...
         $usia_in = implode("','", $selectedUsia);
-        // Menambahkan kondisi ke array $where menggunakan operator IN untuk mencocokkan beberapa nilai
         $where[] = "p.kelompokUsia IN ('" . $usia_in . "')";
     } else {
-        // Jika $selectedUsia bukan array (hanya satu nilai yang dipilih)
-        // Menambahkan kondisi ke array $where dengan mencocokkan nilai secara langsung setelah menghapus spasi ekstra
         $where[] = "p.kelompokUsia = '" . trim($_POST["kelompokUsia"]) . "'";
     }
 }
@@ -86,15 +78,17 @@ if (!empty($_POST["jenisDisabilitas"])) {
         $where[] = "jd.jenisDisabilitas = '" . trim($_POST["jenisDisabilitas"]) . "'";
     }
 }
+// Filter Kelurahan (khusus Sedayu, ID 40579–40582)
+if (!empty($_POST["idKelurahan"])) {
+    $where[] = "p.idKelurahanDomisili = '" . intval($_POST["idKelurahan"]) . "'";
+}
 
-// Jika ada filter yang dipilih, gabungkan dengan operator AND dan tambahkan ke query SQL
 if (count($where) > 0) {
     $sql .= " WHERE " . implode(" AND ", $where);
 }
 
 $sql .= " ORDER BY p.idPasien;";
 
-// Eksekusi Query
 $view = new cView();
 $arrayhasil = $view->vViewData($sql);
 ?>
@@ -133,12 +127,16 @@ if (!empty($arrayGoldar)) {
     }
 }
 
-// Ambil daftar jenis disabilitas
+// Daftar jenis disabilitas
 $disabilitasQuery = "SELECT DISTINCT jenisDisabilitas FROM jenis_disabilitas";
 $enumDisabilitas = $view->vViewData($disabilitasQuery);
+
+// Daftar kelurahan dengan id tertentu
+$kelurahanQuery = "SELECT idKelurahan, namaKelurahan FROM kelurahan WHERE idKelurahan BETWEEN 40579 AND 40582";
+$kelurahanList = $view->vViewData($kelurahanQuery);
 ?>
 
-<!-- Form Pencarian -->
+<!-- FILTERING -->
 <div class="row">
     <div class="col-md-12">
         <form method="post" action="" enctype="multipart/form-data">
@@ -161,6 +159,7 @@ $enumDisabilitas = $view->vViewData($disabilitasQuery);
                         } ?>
                     </select>
                 </div>
+                <div><br></div>
             </div>
             <div class="row">
                 <div class="col-4">
@@ -181,15 +180,25 @@ $enumDisabilitas = $view->vViewData($disabilitasQuery);
                         } ?>
                     </select>
                 </div>
-            </div>
+                <div class="col-4">
+                    <label for="idKelurahan">KELURAHAN (Sedayu)</label>
+                    <select name="idKelurahan" class="form-control">
+                        <option value="">- pilihan -</option>
+                        <?php foreach ($kelurahanList as $row) {
+                            echo '<option value="' . $row["idKelurahan"] . '">' . $row["namaKelurahan"] . '</option>';
+                        } ?>
+                    </select>
+                </div>
+                <br>
+                <p></p>
             <br>
-            <button type="submit" class="btn btn-primary" style="width: 15%;" name="searchbtn" value="true"><b>CARI</b></button>
+            <button type="submit" class="btn btn-primary" style="width: 15%; margin-left: 10px;" name="searchbtn" value="true"><b>CARI</b></button>
         </form>
     </div>
 </div>
 
 <!-- Tabel Hasil -->
-<div class="row mx-2">
+<div class="row">
     <div class="col-md-12">
         <br><br>
         <div class="table-responsive">
@@ -198,14 +207,15 @@ $enumDisabilitas = $view->vViewData($disabilitasQuery);
                     <thead>
                         <tr>
                             <th width="2%">No.</th>
-                            <th class="text-center">Nama Pasien</th>
-                            <th class="text-center">Jenis Kelamin</th>
-                            <th class="text-center" width="12%">Usia</th>
-                            <th class="text-center" width="3%">Golongan Darah</th>
-                            <th class="text-center" width="15%">Alamat</th>
-                            <th class="text-center" width="5%">Jenis Disabilitas</th>
-                            <th class="text-center">Sub Jenis Disabilitas</th>
-                            <th class="text-center">Alat Bantu</th>
+                            <th class="text-center" width="">Nama Pasien</th>
+                            <th class="text-center" width="">Jenis Kelamin</th>
+                            <th class="text-center" width="">Usia</th>
+                            <th class="text-center" width="">Golongan Darah</th>
+                            <th class="text-center" width="5%">Alamat</th>
+                            <th class="text-center" width="">Kelurahan</th>
+                            <th class="text-center" width="">Jenis Disabilitas</th>
+                            <th class="text-center" width="">Sub Jenis Disabilitas</th>
+                            <th class="text-center" width="">Alat Bantu</th>
                             <th width="5%">DETAIL</th>
                         </tr>
                     </thead>
@@ -222,6 +232,7 @@ $enumDisabilitas = $view->vViewData($disabilitasQuery);
                                 <td><?= $data["kelompokUsia"]; ?></td>
                                 <td><?= $data["golonganDarah"]; ?></td>
                                 <td><?= $data["alamatDomisili"]; ?></td>
+                                <td><?= $data["namaKelurahan"]; ?></td>
                                 <td><?= $data["jenisDisabilitas"]; ?></td>
                                 <td><?= $data["namaDisabilitas"]; ?></td>
                                 <td><?= $data["alatBantu"]; ?></td>
@@ -233,12 +244,6 @@ $enumDisabilitas = $view->vViewData($disabilitasQuery);
                                         </button>
                                     </form>
                                 </td>
-
-                                <!-- <td>
-                                    <a href="411/<?php echo $data["idPasien"]; ?>" class="btn btn-info" style="border-radius: 8px;">
-                                        <i class="fa-regular fa-eye" style="color: #000000;"></i>
-                                    </a>
-                                </td> -->
                             </tr>
                         <?php } ?>
                     </tbody>
@@ -251,6 +256,7 @@ $enumDisabilitas = $view->vViewData($disabilitasQuery);
                     <input type="hidden" name="jenisKelamin" value="<?= $_POST["jenisKelamin"] ?? ''; ?>">
                     <input type="hidden" name="golonganDarah" value="<?= $_POST["golonganDarah"] ?? ''; ?>">
                     <input type="hidden" name="jenisDisabilitas" value="<?= $_POST["jenisDisabilitas"] ?? ''; ?>">
+                    <input type="hidden" name="idKelurahan" value="<?= $_POST["idKelurahan"] ?? ''; ?>">
                     <button type="submit" name="export_pdf" class="btn btn-danger">CETAK PDF</button>
                 </form>
                 <form method="post" action="export_excel.php">
@@ -258,16 +264,10 @@ $enumDisabilitas = $view->vViewData($disabilitasQuery);
                     <input type="hidden" name="jenisKelamin" value="<?= $_POST["jenisKelamin"] ?? ''; ?>">
                     <input type="hidden" name="golonganDarah" value="<?= $_POST["golonganDarah"] ?? ''; ?>">
                     <input type="hidden" name="jenisDisabilitas" value="<?= $_POST["jenisDisabilitas"] ?? ''; ?>">
+                    <input type="hidden" name="idKelurahan" value="<?= $_POST["idKelurahan"] ?? ''; ?>">
                     <button type="submit" name="export_excel" class="btn btn-success">CETAK EXCEL</button>
                 </form>
             </div>
-            
-            <?php
-                if(isset($_POST['export_pdf'])){
-                    header("location 61");
-                }
-            ?>
-
             <br><br><br>
         </div>
     </div>

@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Asia/Jakarta');
+
 include_once("../_function_i/cView.php");
 include_once("../_function_i/cConnect.php");
 
@@ -26,13 +28,15 @@ if (!empty($_POST['golonganDarah'])) {
 if (!empty($_POST['jenisDisabilitas'])) {
     $where[] = "jd.jenisDisabilitas = '" . $_POST['jenisDisabilitas'] . "'";
 }
+if (!empty($_POST['idKelurahan'])) {
+    $where[] = "p.idKelurahanDomisili = '" . $_POST['idKelurahan'] . "'";
+}
 
-// Query data pasien
-$sql = "SELECT p.*, jd.jenisDisabilitas, subJD.namaDisabilitas 
-        FROM pasien p 
-        LEFT JOIN sub_disabilitas subJD ON subJD.idSubDisabilitas = p.idSubDisabilitas 
-        LEFT JOIN jenis_disabilitas jd ON jd.idJenisDisabilitas = subJD.idJenisDisabilitas";
-
+$sql = "SELECT p.*, sd.*, jd.*, k.namaKelurahan 
+        FROM pasien p
+        JOIN sub_disabilitas sd ON sd.idSubDisabilitas = p.idSubDisabilitas
+        JOIN jenis_disabilitas jd ON jd.idJenisDisabilitas = sd.idJenisDisabilitas
+        LEFT JOIN kelurahan k ON k.idKelurahan = p.idKelurahanDomisili";
 if (count($where) > 0) {
     $sql .= " WHERE " . implode(" AND ", $where);
 }
@@ -41,7 +45,7 @@ $sql .= " GROUP BY p.idPasien";
 $dataPasien = $view->vViewData($sql);
 
 // Mendapatkan tanggal cetak
-$tanggalCetak = date("d-m-Y H:i", strtotime("+6 hours"));
+$tanggalCetak = date("d-m-Y H:i");
 
 // Menampilkan judul laporan
 echo "<table border='1'>";
@@ -57,6 +61,7 @@ echo "<tr>
         <th>Kelompok Usia</th>
         <th>Golongan Darah</th>
         <th>Alamat</th>
+        <th>Kelurahan</th>
         <th>Jenis Disabilitas</th>
         <th>Sub Jenis Disabilitas</th>
         <th>Alat Bantu</th>
@@ -70,7 +75,8 @@ foreach ($dataPasien as $row) {
             <td>" . $row['jenisKelamin'] . "</td>
             <td>" . $row['kelompokUsia'] . "</td>
             <td>" . $row['golonganDarah'] . "</td>
-            <td>" . $row['alamatLengkap'] . "</td>
+            <td>" . $row['alamatDomisili'] . "</td>
+            <td>" . $row['namaKelurahan'] . "</td>
             <td>" . $row['jenisDisabilitas'] . "</td>
             <td>" . $row['namaDisabilitas'] . "</td>
             <td>" . $row['alatBantu'] . "</td>

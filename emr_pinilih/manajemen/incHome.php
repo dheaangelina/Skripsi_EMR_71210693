@@ -90,7 +90,7 @@
                                 <th width=''>Waktu Mulai</th>
                                 <th width=''>Waktu Selesai</th>
                                 <th width=''>Program</th>
-                                <th width='25%'>Instansi</th>
+                                <th width=''>Instansi</th>
                                 <th width=''>Jumlah Peserta</th>
                                 <th width='5%'>Detail</th>
                             </tr>

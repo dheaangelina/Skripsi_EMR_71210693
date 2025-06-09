@@ -108,7 +108,7 @@ $link = $segments[2];
                         <li><a class="dropdown-item" href="#"><?= $_SESSION["jabatan"]; ?></a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="<?= $baseurl; ?>/61"><ion-icon name="settings-outline"></ion-icon> Atur Profil</a></li>
-                        <li><a class="dropdown-item text-danger" href="../logout.php"><ion-icon name="log-out-outline"></ion-icon> Log Out</a></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="confirmLogout(event)"><ion-icon name="log-out-outline"></ion-icon> Log Out</a></li>
                     </ul>
             </ul>
             <div class="offcanvas offcanvas-start bg-light" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
@@ -129,7 +129,7 @@ $link = $segments[2];
                                 </a></li>
                                 <li><a class="dropdown-item mb-2" href="<?= $baseurl; ?>/32">
                                     <i class="fa-solid fa-people-robbery" style="color:black;"></i> &nbsp; Kinesioterapi
-                                </a></li>
+                                </a></li>                                
                             </ul>
                         </li>
                         <li class="nav-item mb-2">
@@ -171,7 +171,7 @@ $link = $segments[2];
                 break;
             case 61:
                 include("incAturProfil.php");
-                break;
+                break;         
         }
         ?>
     </div>
@@ -195,7 +195,6 @@ $link = $segments[2];
     <!-- tooltips -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Aktifkan semua elemen dengan tooltip di dalam dokumen
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
@@ -218,51 +217,6 @@ $link = $segments[2];
             });
         });
     </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const numberInputs = document.querySelectorAll('input[type="number"]');
-        
-            numberInputs.forEach(function (input) {
-                // Buat elemen pesan error jika belum ada
-                if (!input.nextElementSibling || !input.nextElementSibling.classList.contains('error-msg')) {
-                    const errorMessage = document.createElement('small');
-                    errorMessage.classList.add('error-msg');
-                    errorMessage.style.color = 'red';
-                    errorMessage.style.display = 'none';
-                    errorMessage.textContent = 'Harus isi angka!';
-                    input.parentNode.appendChild(errorMessage);
-                }
-            
-                const errorMsg = input.nextElementSibling;
-            
-                // Cegah input huruf dari keyboard
-                input.addEventListener('keydown', function (e) {
-                    const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
-                    const isNumber = /^[0-9]$/.test(e.key);
-                
-                    if (!isNumber && !allowedKeys.includes(e.key)) {
-                        e.preventDefault();
-                        errorMsg.style.display = 'block';
-                        input.classList.add('is-invalid');
-                    }
-                });
-            
-                // Validasi saat nilai berubah (termasuk copy-paste)
-                input.addEventListener('input', function () {
-                    const onlyNumbers = /^\d*$/;
-                    if (onlyNumbers.test(input.value)) {
-                        errorMsg.style.display = 'none';
-                        input.classList.remove('is-invalid');
-                    } else {
-                        errorMsg.style.display = 'block';
-                        input.classList.add('is-invalid');
-                    }
-                });
-            });
-        });
-    </script>
-
    
     <!-- validasi number  -->
     <script>
@@ -270,7 +224,6 @@ $link = $segments[2];
             const numberInputs = document.querySelectorAll('input[type="number"]');
         
             numberInputs.forEach(function (input) {
-                // Buat elemen pesan error jika belum ada
                 if (!input.nextElementSibling || !input.nextElementSibling.classList.contains('error-msg')) {
                     const errorMessage = document.createElement('small');
                     errorMessage.classList.add('error-msg');
@@ -282,7 +235,6 @@ $link = $segments[2];
             
                 const errorMsg = input.nextElementSibling;
             
-                // Cegah input huruf dari keyboard
                 input.addEventListener('keydown', function (e) {
                     const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete'];
                     const isNumber = /^[0-9]$/.test(e.key);
@@ -294,7 +246,6 @@ $link = $segments[2];
                     }
                 });
             
-                // Validasi saat nilai berubah (termasuk copy-paste)
                 input.addEventListener('input', function () {
                     const onlyNumbers = /^\d*$/;
                     if (onlyNumbers.test(input.value)) {
@@ -315,7 +266,6 @@ $link = $segments[2];
         const timeInputs = document.querySelectorAll('input[type="time"]');
         
         timeInputs.forEach(function (input) {
-            // Buat elemen pesan error jika belum ada
             if (!input.nextElementSibling || !input.nextElementSibling.classList.contains('error-msg')) {
                 const errorMessage = document.createElement('small');
                 errorMessage.classList.add('error-msg');
@@ -327,20 +277,17 @@ $link = $segments[2];
 
             const errorMsg = input.nextElementSibling;
 
-            // Fungsi untuk memformat waktu menjadi hh:mm:ss
             function formatTimeToHHMMSS(timeValue) {
-                const parts = timeValue.split(':'); // dari hh:mm
+                const parts = timeValue.split(':');
                 if (parts.length !== 2) return '';
                 return parts[0] + ':' + parts[1] + ':00'; // hh:mm:ss
             }
 
             function isValidTime(timeValue) {
-                // Cek apakah formatnya sesuai dengan hh:mm (waktu 24 jam)
                 const timePattern = /^\d{2}:\d{2}$/;
                 return timePattern.test(timeValue);
             }
 
-            // Cegah input huruf atau karakter yang tidak valid
             input.addEventListener('keydown', function (e) {
                 const allowedKeys = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', ':'];
                 const isNumber = /^[0-9]$/.test(e.key);
@@ -352,7 +299,6 @@ $link = $segments[2];
                 }
             });
 
-            // Validasi saat nilai berubah (termasuk copy-paste)
             input.addEventListener('input', function () {
                 if (input.value && isValidTime(input.value)) {
                     const formattedTime = formatTimeToHHMMSS(input.value);
@@ -365,7 +311,6 @@ $link = $segments[2];
                 }
             });
 
-            // Validasi saat blur (keluar dari input)
             input.addEventListener('blur', function () {
                 if (!input.value || !isValidTime(input.value)) {
                     errorMsg.style.display = 'block';
@@ -387,7 +332,6 @@ $link = $segments[2];
         const dateInputs = document.querySelectorAll('input[type="date"]');
 
         dateInputs.forEach(function (input) {
-            // Buat elemen pesan error jika belum ada
             if (!input.nextElementSibling || !input.nextElementSibling.classList.contains('error-msg')) {
                 const errorMessage = document.createElement('small');
                 errorMessage.classList.add('error-msg');
@@ -427,7 +371,6 @@ $link = $segments[2];
                 }
             });
 
-            // Validasi saat nilai berubah
             input.addEventListener('input', function () {
                 if (input.value && isValidDate(input.value)) {
                     const formattedDate = formatDateToMMDDYYYY(input.value);
@@ -440,7 +383,6 @@ $link = $segments[2];
                 }
             });
 
-            // Validasi saat blur (keluar dari input)
             input.addEventListener('blur', function () {
                 if (!input.value || !isValidDate(input.value)) {
                     errorMsg.style.display = 'block';
@@ -456,6 +398,26 @@ $link = $segments[2];
     });
     </script>
 
+    <script>
+        function confirmLogout(event) {
+            event.preventDefault();
+        
+            Swal.fire({
+                title: 'Konfirmasi Logout',
+                text: "Apakah Anda yakin ingin keluar?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Logout!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "../logout.php";
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

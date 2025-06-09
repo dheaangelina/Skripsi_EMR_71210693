@@ -11,6 +11,7 @@ header("Content-Type: application/json");
 $tahun = isset($_GET["tahun"]) && !empty($_GET["tahun"]) ? intval($_GET["tahun"]) : date("Y");
 
 // Query untuk mendapatkan jumlah pasien per bulan
+// LEFT JOIN supaya semua bulan tetap muncul meskipun tidak ada data jumlah pasiennya
 $sql = "WITH Bulan AS (
     SELECT 1 AS bulan UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 
     UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 
@@ -18,12 +19,12 @@ $sql = "WITH Bulan AS (
 )
 SELECT 
     b.bulan,
-    COALESCE(SUM(CASE WHEN j.idProgram = 1 THEN 1 ELSE 0 END), 0) AS fisioterapi,
-    COALESCE(SUM(CASE WHEN j.idProgram = 2 THEN 1 ELSE 0 END), 0) AS kinesioterapi
+    COALESCE(SUM(CASE WHEN j.idProgram = 1 AND h.idPasien IS NOT NULL THEN 1 ELSE 0 END), 0) AS fisioterapi,
+    COALESCE(SUM(CASE WHEN j.idProgram = 2 AND h.idPasien IS NOT NULL THEN 1 ELSE 0 END), 0) AS kinesioterapi
 FROM Bulan b
 LEFT JOIN jadwal_program j 
     ON MONTH(j.tanggalKegiatan) = b.bulan 
-    AND YEAR(j.tanggalKegiatan) = $tahun  -- Filter tahun
+    AND YEAR(j.tanggalKegiatan) = $tahun
 LEFT JOIN hasil_layanan h 
     ON j.idJadwal = h.idJadwal
 GROUP BY b.bulan
@@ -31,9 +32,6 @@ ORDER BY b.bulan";
 
 $view = new cView();
 $data = $view->vViewData($sql);
-
-// Debugging untuk melihat hasil query
-// var_dump($data); exit;
 
 $result = [
     "labels" => [],
@@ -43,7 +41,7 @@ $result = [
     ]
 ];
 
-// Pastikan bulan 1-12 tetap muncul meskipun datanya kosong
+// Mempermudah akses data berdasarkan bulan dan memastikan bulan 1-12 tetap muncul meskipun datanya kosong
 $bulanArray = range(1, 12);
 $dataMap = [];
 foreach ($data as $row) {

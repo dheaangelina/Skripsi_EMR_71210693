@@ -6,20 +6,19 @@ include_once("../_function_i/cUpdate.php");
 include_once("../_function_i/cDelete.php");
 include_once("../_function_i/inc_f_object.php");
 
-
-// Ambil URL path dari permintaan
+// Ambil URL path dari permintaan, lalu menghapus / di awal dan akhir, lalu memisahkan berdasarkan /
 $request = $_SERVER['REQUEST_URI'];
 $request = trim($request, '/');
 $segments = explode('/', $request);
 
+// idJadwal pada index 3
+// emr_pinilih = 0, role = 1, menu = 2
 if (empty($segments[3])) {
     $segments[3] = $segments[2];
 } else {
     $segments[3] = $segments[3];
 }
 $idJadwal = $segments[3];
-
-// echo $idJadwal;
 
 $conn = new cConnect();
 $conn->goConnect();
@@ -54,29 +53,29 @@ $datajadwal = $datajadwal[0]; // Ambil hasil pertama
             <div class="card-body">
                 <table class="table">
                 <tr>
-                        <th>Tanggal Kegiatan</th>
-                        <td><?= $datajadwal['tanggalKegiatan'] ?></td>
-                    </tr>
-                    <tr>
-                        <th>Waktu Mulai</th>
-                        <td><?= $datajadwal['waktuMulai'] ?></td>
-                    </tr>
-                    <tr>
-                        <th>Waktu Selesai</th>
-                        <td><?= $datajadwal['waktuSelesai'] ?></td>
-                    </tr>
-                    <tr>
-                        <th>Lokasi</th>
-                        <td><?= $datajadwal['lokasi'] ?></td>
-                    </tr>
-                    <tr>
-                        <th>Instansi</th>
-                        <td><?= $datajadwal['instansi'] ?></td>
-                    </tr>
-                    <tr>
-                        <th>Catatan</th>
-                        <td><?= nl2br($datajadwal['catatan']) ?></td>
-                    </tr>
+                    <th style="width: 200px;">Tanggal Kegiatan</th>
+                    <td><?= $datajadwal['tanggalKegiatan'] ?></td>
+                </tr>
+                <tr>
+                    <th>Waktu Mulai</th>
+                    <td><?= $datajadwal['waktuMulai'] ?></td>
+                </tr>
+                <tr>
+                    <th>Waktu Selesai</th>
+                    <td><?= $datajadwal['waktuSelesai'] ?></td>
+                </tr>
+                <tr>
+                    <th>Lokasi</th>
+                    <td><?= $datajadwal['lokasi'] ?></td>
+                </tr>
+                <tr>
+                    <th>Instansi</th>
+                    <td><?= $datajadwal['instansi'] ?></td>
+                </tr>
+                <tr>
+                    <th>Catatan</th>
+                    <td><?= nl2br($datajadwal['catatan']) ?></td>
+                </tr>
                 </table>
             </div>
         </div>    

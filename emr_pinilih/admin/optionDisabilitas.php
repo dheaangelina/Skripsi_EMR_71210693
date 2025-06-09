@@ -16,9 +16,9 @@ $pdo = new PDO('mysql:host='.$host.';dbname='.$database, $username, $password);
 
   $html = "<option value=''>- pilihan -</option>";
   while($data = $sqlDisabilitas->fetch()){ // Ambil semua data dari hasil eksekusi $sql
-    $html .= "<option value='".$data['idSubDisabilitas']."'>".$data['namaDisabilitas']."</option>"; // Tambahkan tag option ke variabel $html
+    $html .= "<option value='".$data['idSubDisabilitas']."'>".$data['namaDisabilitas']."</option>";
   }
 
-  $callback = array('data_disabilitas'=>$html); // Masukan variabel html tadi ke dalam array $callback dengan index array : data_subDisabilitas
-  echo json_encode($callback); // konversi varibael $callback menjadi JSON
+  $callback = array('data_disabilitas'=>$html); // Masukan variabel html ke dalam array $callback dengan index array : data_disabilitas
+  echo json_encode($callback);
 ?>

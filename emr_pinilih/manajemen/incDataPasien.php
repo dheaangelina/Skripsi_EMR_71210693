@@ -2,7 +2,7 @@
 $host = 'localhost';
 $username = 'root';
 $password = '';
-$database = 'emr';
+$database = 'emr_pinilih';
 
 // Koneksi ke MySQL dengan PDO
 $pdo = new PDO('mysql:host='.$host.';dbname='.$database, $username, $password);
@@ -133,12 +133,11 @@ $pdo = new PDO('mysql:host='.$host.';dbname='.$database, $username, $password);
                     <table id="example" class="table table-condensed">
                         <thead>
                             <tr class=''>
-                                <!-- <th width='5%'>ID Pasien</th> -->
                                 <th width='5%'>No.</th>
-                                <th width='10%'>Nama Pasien</th>
-                                <th width='15%'>Usia</th>
+                                <th width='17%'>Nama Pasien</th>
+                                <th width='18%'>Usia</th>
                                 <th width='15%'>Jenis Kelamin</th>
-                                <th width=''>Alamat Domisili</th>
+                                <th width='15%'>Kelurahan Domisili</th>
                                 <th width=''>Disabilitas</th>
                                 <th width='5%'>VIEW</th>
                             </tr>
@@ -155,7 +154,7 @@ $pdo = new PDO('mysql:host='.$host.';dbname='.$database, $username, $password);
                                     <td><?= $datapasien["namaLengkap"]; ?></td>
                                     <td><?= $datapasien["kelompokUsia"]; ?></td>
                                     <td><?= $datapasien["jenisKelamin"]; ?></td>
-                                    <td><?= $datapasien["alamatDomisili"]; ?></td>
+                                    <td><?= $datapasien["namaKelurahan"]; ?></td>
                                     <td><?= $datapasien["namaDisabilitas"]; ?></td>
                                     <td>
                                         <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#formview<?= $datapasien["idPasien"]; ?>" style="border-radius: 8px;">

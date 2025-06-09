@@ -3,13 +3,14 @@
 if (!empty($_POST["savebtn"])) {
     $linkurl = 22;
 
-    // Mapping ENUM ke Label Tampilan
+    // Mapping ENUM dari Database ke Label Tampilan
     $enumJTMapping = [
         "Tenaga Medis" => "Tenaga Medis - Dokter, Psikiater",
         "Tenaga Paramedis" => "Tenaga Paramedis - Perawat",
         "Tenaga Non Medis" => "Tenaga Non Medis - Psikolog, Terapis, Volunteer, dll"
     ];
 
+    // Mencari nilai $_POST["jenisTerapis"] dalam array $enumJTMapping, lalu mengembalikan key-nya (nilai ENUM)
     $jenisTerapis = array_search($_POST["jenisTerapis"], $enumJTMapping);
     if ($jenisTerapis === false) {
         $jenisTerapis = $_POST["jenisTerapis"]; // Gunakan langsung jika tidak ditemukan
@@ -31,7 +32,7 @@ if (!empty($_POST["savebtn"])) {
     }
 
     // Upload File dokumenLainnya
-    $targetDir = "uploads/sertifikasi/";
+    $targetDir = "uploads/dokumenLain/";
     $fileNameLainnya = basename($_FILES["dokumenLainnya"]["name"]);
     $filePathLainnya = $targetDir . time() . "_" . $fileNameLainnya;
     
@@ -101,13 +102,19 @@ if (!empty($_POST["editbtn"])) {
     }
 
     // Upload File dokumenLainnya
-    $targetDir = "uploads/dokumenLain/";
+    // __DIR__ = folder saat ini (admin/)
+    $targetDirRelatif = "uploads/dokumenLain/";
+    $targetDir = __DIR__ . "/uploads/dokumenLain/"; // Path absolut
+    if (!file_exists($targetDir)) {
+        mkdir($targetDir, 0777, true); // Buat folder jika belum ada
+    }
     $fileNameLainnya = basename($_FILES["dokumenLainnya"]["name"]);
-    $filePathLainnya = $targetDir . time() . "_" . $fileNameLainnya;
+    $filePathLainnya = $targetDir . time() . "_" . $fileNameLainnya; // Path absolut
+    $filePathLainnyaRelatif = $targetDirRelatif . time() . "_" . $fileNameLainnya; // Simpan relatif di DB
     
     if (!empty($_FILES["dokumenLainnya"]["tmp_name"])) {
         if (move_uploaded_file($_FILES["dokumenLainnya"]["tmp_name"], $filePathLainnya)) {
-            $dokumenLainnya = "'" . $filePathLainnya . "'";
+            $dokumenLainnya = "'" . $filePathLainnyaRelatif . "'";
         } else {
             $dokumenLainnya = "'" . $dokumenLainnyaLama . "'";
         }
@@ -387,7 +394,6 @@ if (!empty($_POST["btnhapus"])) {
             <div class="col-md-12">
                 <?php
                 $sqlterapis = "SELECT t.* FROM terapis t ORDER BY idTerapis DESC";
-                // echo $sqlterapis;
                 $view = new cView();
                 $arrayterapis = $view->vViewData($sqlterapis);
                 ?>
@@ -432,7 +438,7 @@ if (!empty($_POST["btnhapus"])) {
                                         }
 
                                         // Path file DOKUMENTASI SERTIFIKASI
-                                        $dokumenPath2 = "uploads/sertifikasi/" . basename($dataterapis["dokumenLainnya"]);
+                                        $dokumenPath2 = "uploads/dokumenLain/" . basename($dataterapis["dokumenLainnya"]);
 
                                         if (!empty($dataterapis["dokumenLainnya"]) && file_exists($dokumenPath2)) {
                                             $dokumenLainnya = '<a href="../admin/' . htmlspecialchars($dokumenPath2) . '" target="_new">Lihat Dokumen</a>';

@@ -19,13 +19,25 @@ $sql = "WITH Bulan AS (
 SELECT 
     b.bulan,
     COALESCE(SUM(CASE WHEN j.idProgram = 1 THEN 1 ELSE 0 END), 0) AS fisioterapi,
-    COALESCE(SUM(CASE WHEN j.idProgram = 2 THEN 1 ELSE 0 END), 0) AS kinesioterapi
+    COALESCE(SUM(CASE WHEN j.idProgram = 2 THEN 1 ELSE 0 END), 0) AS kinesioterapi,
+    COALESCE(SUM(CASE WHEN j.idProgram = 3 THEN 1 ELSE 0 END), 0) AS screening,
+    COALESCE(SUM(CASE WHEN j.idProgram = 4 THEN 1 ELSE 0 END), 0) AS konsultasi,
+    COALESCE(SUM(pe.jumlah_peserta), 0) AS edukasi
 FROM Bulan b
 LEFT JOIN jadwal_program j 
     ON MONTH(j.tanggalKegiatan) = b.bulan 
     AND YEAR(j.tanggalKegiatan) = $tahun  -- Filter tahun
 LEFT JOIN hasil_layanan h 
     ON j.idJadwal = h.idJadwal
+LEFT JOIN program_edukasi p 
+    ON j.idJadwal = p.idJadwal
+LEFT JOIN (
+    SELECT p.idJadwal, COUNT(pe.idPeserta) AS jumlah_peserta
+    FROM program_edukasi p
+    JOIN peserta_edukasi pe ON p.idEdukasi = pe.idEdukasi
+    GROUP BY p.idJadwal
+) pe 
+    ON j.idJadwal = pe.idJadwal
 GROUP BY b.bulan
 ORDER BY b.bulan";
 
@@ -39,7 +51,10 @@ $result = [
     "labels" => [],
     "datasets" => [
         "fisioterapi" => [],
-        "kinesioterapi" => []
+        "kinesioterapi" => [],
+        "screening" => [],
+        "konsultasi" => [],
+        "edukasi" => []
     ]
 ];
 
@@ -54,6 +69,9 @@ foreach ($bulanArray as $bulan) {
     $result["labels"][] = $bulan;
     $result["datasets"]["fisioterapi"][] = $dataMap[$bulan]["fisioterapi"] ?? 0;
     $result["datasets"]["kinesioterapi"][] = $dataMap[$bulan]["kinesioterapi"] ?? 0;
+    $result["datasets"]["screening"][] = $dataMap[$bulan]["screening"] ?? 0;
+    $result["datasets"]["konsultasi"][] = $dataMap[$bulan]["konsultasi"] ?? 0;
+    $result["datasets"]["edukasi"][] = $dataMap[$bulan]["edukasi"] ?? 0;
 }
 
 echo json_encode($result);

@@ -7,6 +7,7 @@ $conn->goConnect();
 
 header("Content-Type: application/json");
 
+// Mengambil idJenisDisabilitas yang dipilih pada grafik
 $idJenisDisabilitas = isset($_GET['idJenisDisabilitas']) ? intval($_GET['idJenisDisabilitas']) : 0;
 
 if ($idJenisDisabilitas == 0) {

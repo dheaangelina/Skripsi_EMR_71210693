@@ -4,7 +4,6 @@ $username = 'root';
 $password = '';
 $database = 'emr';
 
-// Koneksi ke MySQL dengan PDO
 $pdo = new PDO('mysql:host='.$host.';dbname='.$database, $username, $password);
 ?>
 
@@ -21,14 +20,14 @@ if (!empty($_POST["savebtn"])) {
     $alasanTidakAktif = isset($_POST["alasanTidakAktif"]) ? $_POST["alasanTidakAktif"] : ""; 
 
     if (!empty($_POST["riwayatPenyakitPribadi"])) {
-        $riwayatPenyakitPribadi = implode(",", $_POST["riwayatPenyakitPribadi"]); // Gabungkan nilai dengan koma
+        $riwayatPenyakitPribadi = implode(", ", $_POST["riwayatPenyakitPribadi"]);
     } else {
-        $riwayatPenyakitPribadi = ""; // Jika tidak ada yang dicentang, kosongkan
+        $riwayatPenyakitPribadi = "";
     }
     if (!empty($_POST["riwayatPenyakitKeluarga"])) {
-        $riwayatPenyakitKeluarga = implode(",", $_POST["riwayatPenyakitKeluarga"]); // Gabungkan nilai dengan koma
+        $riwayatPenyakitKeluarga = implode(", ", $_POST["riwayatPenyakitKeluarga"]); 
     } else {
-        $riwayatPenyakitKeluarga = ""; // Jika tidak ada yang dicentang, kosongkan
+        $riwayatPenyakitKeluarga = ""; 
     }
 
     $datafield_pasien = array("namaLengkap", "namaPanggilan", "nik", "tempatLahir", "tanggalLahir", "kelompokUsia", "jenisKelamin", "golonganDarah", "noTeleponPasien", "alamatLengkap", "alamatDomisili", "tanggalAktif", "statusPasien", "alasanTidakAktif", "idSubDisabilitas", "alatBantu", "kebutuhanKhusus", "riwayatPenyakitPribadi", "riwayatPenyakitKeluarga", "alergi", "trauma", "namaOrangTua", "noTelpOrangTua", "namaPendamping", "noTelpPendamping", "namaJalan", "idKelurahanDomisili", "kodePosDomisili", "RTDomisili", "RWDomisili", "agama", "suku", "bahasaDikuasai", "pendidikan", "pekerjaan", "statusPernikahan", "keterangan");
@@ -56,14 +55,14 @@ if (!empty($_POST["editbtn"])) {
     $RWDomisili = !empty($_POST["RWDomisili"]) ? $_POST["RWDomisili"] : NULL;
     
     if (!empty($_POST["riwayatPenyakitPribadi"])) {
-        $riwayatPenyakitPribadi = implode(",", $_POST["riwayatPenyakitPribadi"]); // Gabungkan nilai dengan koma
+        $riwayatPenyakitPribadi = implode(", ", $_POST["riwayatPenyakitPribadi"]); 
     } else {
-        $riwayatPenyakitPribadi = ""; // Jika tidak ada yang dicentang, kosongkan
+        $riwayatPenyakitPribadi = "";
     }
     if (!empty($_POST["riwayatPenyakitKeluarga"])) {
-        $riwayatPenyakitKeluarga = implode(",", $_POST["riwayatPenyakitKeluarga"]); // Gabungkan nilai dengan koma
+        $riwayatPenyakitKeluarga = implode(", ", $_POST["riwayatPenyakitKeluarga"]);
     } else {
-        $riwayatPenyakitKeluarga = ""; // Jika tidak ada yang dicentang, kosongkan
+        $riwayatPenyakitKeluarga = ""; 
     }
 
     $statusPasien = isset($_POST["statusPasien"]) ? $_POST["statusPasien"] : "0"; 
@@ -99,7 +98,7 @@ if (!empty($_POST["btnhapus"])) {
     $arrayUsia = $view->vViewData($usia);
     $enumKelompokUsia = [];
     if (!empty($arrayUsia)) {
-        $row = $arrayUsia[0]; // Ambil hasil pertama
+        $row = $arrayUsia[0];
         if (preg_match("/^enum\((.*)\)$/", $row['Type'], $matches)) {
             $enumKelompokUsia = explode(",", str_replace("'", "", $matches[1]));
         }
@@ -111,7 +110,7 @@ if (!empty($_POST["btnhapus"])) {
     $arrayJK = $view->vViewData($jk);
     $enumJK = [];
     if (!empty($arrayJK)) {
-        $row = $arrayJK[0]; // Ambil hasil pertama
+        $row = $arrayJK[0];
         if (preg_match("/^enum\((.*)\)$/", $row['Type'], $matches)) {
             $enumJK = explode(",", str_replace("'", "", $matches[1]));
         }
@@ -123,7 +122,7 @@ if (!empty($_POST["btnhapus"])) {
     $arrayGoldar = $view->vViewData($goldar);
     $enumGoldar = [];
     if (!empty($arrayGoldar)) {
-        $row = $arrayGoldar[0]; // Ambil hasil pertama
+        $row = $arrayGoldar[0];
         if (preg_match("/^enum\((.*)\)$/", $row['Type'], $matches)) {
             $enumGoldar = explode(",", str_replace("'", "", $matches[1]));
         }
@@ -135,7 +134,7 @@ if (!empty($_POST["btnhapus"])) {
     $arrayAgama = $view->vViewData($agama);
     $enumAgama = [];
     if (!empty($arrayAgama)) {
-        $row = $arrayAgama[0]; // Ambil hasil pertama
+        $row = $arrayAgama[0];
         if (preg_match("/^enum\((.*)\)$/", $row['Type'], $matches)) {
             $enumAgama = explode(",", str_replace("'", "", $matches[1]));
         }
@@ -147,7 +146,7 @@ if (!empty($_POST["btnhapus"])) {
     $arrayPendidikan = $view->vViewData($pendidikan);
     $enumPendidikan = [];
     if (!empty($arrayPendidikan)) {
-        $row = $arrayPendidikan[0]; // Ambil hasil pertama
+        $row = $arrayPendidikan[0];
         if (preg_match("/^enum\((.*)\)$/", $row['Type'], $matches)) {
             $enumPendidikan = explode(",", str_replace("'", "", $matches[1]));
         }
@@ -159,7 +158,7 @@ if (!empty($_POST["btnhapus"])) {
     $arrayPekerjaan = $view->vViewData($pekerjaan);
     $enumPekerjaan = [];
     if (!empty($arrayPekerjaan)) {
-        $row = $arrayPekerjaan[0]; // Ambil hasil pertama
+        $row = $arrayPekerjaan[0];
         if (preg_match("/^enum\((.*)\)$/", $row['Type'], $matches)) {
             $enumPekerjaan = explode(",", str_replace("'", "", $matches[1]));
         }
@@ -171,7 +170,7 @@ if (!empty($_POST["btnhapus"])) {
     $arrayStatusNikah = $view->vViewData($statusPernikahan);
     $enumNikah = [];
     if (!empty($arrayStatusNikah)) {
-        $row = $arrayStatusNikah[0]; // Ambil hasil pertama
+        $row = $arrayStatusNikah[0];
         if (preg_match("/^enum\((.*)\)$/", $row['Type'], $matches)) {
             $enumNikah = explode(",", str_replace("'", "", $matches[1]));
         }
@@ -341,7 +340,7 @@ if (!empty($_POST["btnhapus"])) {
                                         </div>
                                         <div class="col-6 mb-3">
                                             <label for="subDisabilitas">Sub Jenis Disabilitas <span class="required">*</span></label>
-                                            <select name="subDisabilitas" id="subDisabilitas" class="form-control">
+                                            <select name="subDisabilitas" id="subDisabilitas" class="form-control" required>
                                                 <option value="">- pilihan -</option>
                                             </select>
                                         </div>
@@ -606,14 +605,16 @@ if (!empty($_POST["btnhapus"])) {
             <div class="row">
                 <div class="col-md-12">
                 <?php
-                $sqlpasien = "SELECT p.*, sd.*, jd.*, prov.*, kk.*, kec.*, kel.* FROM pasien p
-                            JOIN sub_disabilitas sd ON p.idSubDisabilitas = sd.idSubDisabilitas
-                            JOIN jenis_disabilitas jd ON sd.idJenisDisabilitas = jd.idJenisDisabilitas
-                            LEFT JOIN kelurahan kel ON p.idKelurahanDomisili = kel.idKelurahan
-                            LEFT JOIN kecamatan kec ON kel.idKecamatan = kec.idKecamatan
-                            LEFT JOIN kotakabupaten kk ON kec.idKotaKabupaten = kk.idKotaKabupaten
-                            LEFT JOIN provinsi prov ON kk.idProvinsi = prov.idProvinsi
-                            ORDER BY idPasien DESC";
+                $sqlpasien = "SELECT p.*, sd.*, jd.*, prov.*, kk.*, kec.*, kel.* 
+                                FROM pasien p
+                                LEFT JOIN sub_disabilitas sd ON p.idSubDisabilitas = sd.idSubDisabilitas
+                                LEFT JOIN jenis_disabilitas jd ON sd.idJenisDisabilitas = jd.idJenisDisabilitas
+                                LEFT JOIN kelurahan kel ON p.idKelurahanDomisili = kel.idKelurahan
+                                LEFT JOIN kecamatan kec ON kel.idKecamatan = kec.idKecamatan
+                                LEFT JOIN kotakabupaten kk ON kec.idKotaKabupaten = kk.idKotaKabupaten
+                                LEFT JOIN provinsi prov ON kk.idProvinsi = prov.idProvinsi
+                                ORDER BY idPasien DESC;
+                                ";
                 $view = new cView();
                 $arraypasien = $view->vViewData($sqlpasien);
                 ?>
@@ -621,12 +622,11 @@ if (!empty($_POST["btnhapus"])) {
                     <table id="example" class="table table-condensed">
                         <thead>
                             <tr class=''>
-                                <!-- <th width='5%'>ID Pasien</th> -->
                                 <th width='5%'>No.</th>
-                                <th width='10%'>Nama Pasien</th>
-                                <th width='15%'>Usia</th>
+                                <th width='17%'>Nama Pasien</th>
+                                <th width='18%'>Usia</th>
                                 <th width='15%'>Jenis Kelamin</th>
-                                <th width=''>Alamat Domisili</th>
+                                <th width='15%'>Kelurahan Domisili</th>
                                 <th width=''>Disabilitas</th>
                                 <th width='5%'>VIEW</th>
                                 <th width='5%'>EDIT</th>
@@ -641,11 +641,10 @@ if (!empty($_POST["btnhapus"])) {
                             ?>
                                 <tr class=''>
                                     <td><?= $cnourut; ?></td>
-                                    <!-- <td><?= $datapasien["idPasien"]; ?></td> -->
                                     <td><?= $datapasien["namaLengkap"]; ?></td>
                                     <td><?= $datapasien["kelompokUsia"]; ?></td>
                                     <td><?= $datapasien["jenisKelamin"]; ?></td>
-                                    <td><?= $datapasien["alamatDomisili"]; ?></td>
+                                    <td><?= $datapasien["namaKelurahan"]; ?></td>
                                     <td><?= $datapasien["namaDisabilitas"]; ?></td>
                                     <td>
                                         <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#formview<?= $datapasien["idPasien"]; ?>" style="border-radius: 8px;">
